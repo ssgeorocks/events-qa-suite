@@ -1,0 +1,92 @@
+
+name: API Tests
+
+on:
+    workflow_call:
+        inputs:
+            suite-ref:
+                description: 'Branch or tag of events-qa-suite'
+                required: false
+                type: string
+                default: 'main'
+
+jobs:
+    run:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        services:
+            mongo:
+                image: mongo:7
+                ports: ['27017:27017']
+                options: >-
+                    --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1})'"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            BASE_URL: http://localhost:8080
+
+        steps:
+            - name: Checkout application code
+              uses: actions/checkout@v4
+
+            - name: Checkout test suite
+              uses: actions/checkout@v4
+              with:
+                repository: ssgeorocks/events-qa-suite
+                ref: ${{ inputs.suite-ref }}
+                path: qa-suite
+
+            - uses: actions/setup-node@v4
+              with:
+                node-version: 24
+                cache: 'npm'
+
+            - run: npm ci
+            
+            - name: Create .env for CI
+              run: |
+                cat > .env <<'EOF'
+                PORT=8080
+                NODE_ENV=development
+                MONGO_URI=mongodb://localhost:27017
+                DB_NAME=jwt_test
+                COOKIE=cookietoken
+                SECRET=ci-not-a-real-secret
+                EOF
+
+            - name: Start events application
+              run: |
+                mkdir -p reports
+                nohup npm start > reports/app.log 2>&1 &
+
+            - name: Wait for application to be ready
+              run: npx wait-on http://localhost:8080/health --timeout 60000
+
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+                cache: 'pip'
+                cache-dependency-path: qa-suite/requirements.txt
+
+            - run: pip install -r qa-suite/requirements.txt
+
+            - name: Run API tests
+              working-directory: qa-suite
+              run: >
+                python -m pytest
+                -v --junitxml=../reports/results.xml
+
+            - name: Logging results 
+              if: failure()
+              run: cat reports/app.log || true
+
+            - name: Upload test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: test-reports
+                path: reports/
+                if-no-files-found: warn

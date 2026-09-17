@@ -5,7 +5,7 @@ from framework.schemas import user_data_schema
 
 
 
-@pytest.mark.smoke
+@pytest.mark.api
 def test_datosuser_cumple_el_contrato(logged_in_client):
     r = logged_in_client.datos_user()
     assert r.status_code == 200, f"{r.status_code} — {r.text}"

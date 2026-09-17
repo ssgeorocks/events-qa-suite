@@ -80,6 +80,7 @@ jobs:
               working-directory: qa-suite
               run: >
                 python -m pytest
+                -m api
                 -v --junitxml=../reports/results.xml
 
             - name: Log output on failure

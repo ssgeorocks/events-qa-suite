@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.smoke
+@pytest.mark.api
 def test_login_emite_cookie_httponly(client, registered_user):
     r = client.login(registered_user["email"], registered_user["password"])
     assert r.status_code == 200, f"{r.status_code} — {r.text}"
@@ -11,7 +11,7 @@ def test_login_emite_cookie_httponly(client, registered_user):
     assert "HttpOnly" in set_cookie, "la cookie debe ser HttpOnly, no accesible por JS"
 
 
-@pytest.mark.smoke
+@pytest.mark.api
 def test_ruta_protegida_accesible_con_sesion(logged_in_client):
     r = logged_in_client.datos_user()
     assert r.status_code == 200, f"{r.status_code} — {r.text}"

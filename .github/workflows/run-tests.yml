@@ -62,7 +62,10 @@ jobs:
               run: |
                   echo "Testing: $IMAGE"
                   docker pull "$IMAGE"
-                  docker run -d --name app --network host --env-file app.env "$IMAGE"
+                  cp app.env .env
+                  docker run -d --name app --network host \
+                        -v "$PWD/.env:/app/.env:ro" \
+                        --env-file app.env "$IMAGE"
                   sleep 5
 
             - name: Wait for /health to respond

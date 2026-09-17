@@ -2,7 +2,7 @@ import os
 
 
 class Settings:
-    """Un solo lugar para la configuración. Nada hardcodeado en los tests."""
+    """Single source for API Client configuration"""
 
     def __init__(self):
         self.base_url = os.environ.get("BASE_URL", "http://localhost:8080")

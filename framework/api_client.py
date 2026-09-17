@@ -4,8 +4,8 @@ from framework.config import Settings
 
 
 class ApiClient:
-    """Centraliza base URL, sesión y cookies.
-    Los tests llaman acciones, no URLs."""
+    """Centrilizes operations and HTTTP methods
+    that reach the Events app"""
 
     def __init__(self, settings=None):
         self.settings = settings or Settings()
@@ -17,8 +17,6 @@ class ApiClient:
 
     def close(self):
         self._client.close()
-
-    # --- acciones ---
 
     def health(self):
         return self._client.get("/health")
@@ -50,14 +48,6 @@ class ApiClient:
     def datos_admin(self):
         return self._client.get("/api/sessions/datosadmin")
 
-    # --- estado, para pruebas negativas ---
-
     @property
     def auth_cookie(self):
         return self._client.cookies.get("cookietoken")
-
-    def set_raw_cookie(self, value):
-        self._client.cookies.set("cookietoken", value)
-
-    def clear_cookies(self):
-        self._client.cookies.clear()

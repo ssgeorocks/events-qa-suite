@@ -30,7 +30,8 @@ def client(settings):
 
 @pytest.fixture
 def user_data():
-    """Datos únicos por test: el email es llave única en el schema."""
+    """User data. This all the information required from the user at the moment.
+    Email will be unique for each test."""
     suffix = uuid.uuid4().hex[:8]
     return {
         "first_name": "Test",
@@ -42,12 +43,12 @@ def user_data():
 @pytest.fixture
 def registered_user(client, user_data):
     r = client.register(**user_data)
-    assert r.status_code in (200, 201), f"registro falló: {r.status_code} — {r.text}"
+    assert r.status_code in (200, 201), f"User registration failed: {r.status_code} — {r.text}"
     return user_data
 
 @pytest.fixture
 def logged_in_client(client, registered_user):
     r = client.login(registered_user["email"], registered_user["password"])
-    assert r.status_code == 200, f"login falló: {r.status_code} — {r.text}"
-    assert client.auth_cookie, "no se emitió la cookie cookietoken"
+    assert r.status_code == 200, f"Login failed: {r.status_code} — {r.text}"
+    assert client.auth_cookie, "Cookie token not issued"
     return client

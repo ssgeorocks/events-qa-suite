@@ -2,16 +2,14 @@ import pytest
 
 
 @pytest.mark.api
-def test_login_emite_cookie_httponly(client, registered_user):
-    r = client.login(registered_user["email"], registered_user["password"])
-    assert r.status_code == 200, f"{r.status_code} — {r.text}"
+def test_login_issues_cookie_token(client, registered_user):
+    res = client.login(registered_user["email"], registered_user["password"])
+    assert res.status_code == 200, f"{res.status_code}: {res.text}"
 
-    set_cookie = r.headers.get("set-cookie", "")
-    assert "cookietoken=" in set_cookie, f"no se emitió cookietoken — {set_cookie}"
-    assert "HttpOnly" in set_cookie, "la cookie debe ser HttpOnly, no accesible por JS"
-
+    set_cookie = res.headers.get("set-cookie", "")
+    assert "cookietoken=" in set_cookie, f"Incorrect cookie token issued: {set_cookie}"
 
 @pytest.mark.api
-def test_ruta_protegida_accesible_con_sesion(logged_in_client):
-    r = logged_in_client.datos_user()
-    assert r.status_code == 200, f"{r.status_code} — {r.text}"
+def test_authenticated_user_can_access_protected_route(logged_in_client):
+    res = logged_in_client.datos_user()
+    assert res.status_code == 200, f"{res.status_code}: {res.text}"

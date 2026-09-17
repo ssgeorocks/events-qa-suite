@@ -1,6 +1,6 @@
 # events-qa-suite
 
-API and E2E test suite for the events app's auth service (JWT + cookieParser). It's kept as its own repo on purpose: no imports from the app's code, its own dependencies, configuration through environment variables only.
+API and E2E test suite for the events app service (JWT + cookieParser).
 
 ## Requirements
 1. Python 3.12+

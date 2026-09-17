@@ -8,6 +8,14 @@ on:
                 required: false
                 type: string
                 default: 'latest'
+            tests:
+                description: 'Tests to run'
+                required: false
+                type: choice
+                default: 'e2e'
+                options:
+                    - e2e
+                    - api
 
 permissions:
     contents: read
@@ -80,7 +88,9 @@ jobs:
             - run: pip install -r requirements.txt
 
             - name: Run test suite
-              run: python -m pytest -v --junitxml=reports/results.xml
+              env:
+                TESTS: ${{ inputs.tests }}
+              run: python -m pytest -m "$TESTS" -v --junitxml=reports/results.xml
 
             - name: Log output on failure
               if: failure()

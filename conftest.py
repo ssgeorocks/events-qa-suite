@@ -1,13 +1,26 @@
+import os
 import uuid
 import pytest
 from framework.api_client import ApiClient
 from framework.config import Settings
+from selenium import webdriver
 
 
 @pytest.fixture(scope="session")
 def settings():
     return Settings()
 
+@pytest.fixture
+def driver():
+    opt = webdriver.ChromeOptions()
+    opt.add_argument("--headless=new")
+    opt.add_argument("--no-sandbox")
+    opt.add_argument("--disable-dev-shm-usage")
+    opt.add_argument("--window-size=1920,1080")
+    driver = webdriver.Chrome(options=opt)
+    driver.implicitly_wait(0)
+    yield driver
+    driver.quit()
 
 @pytest.fixture
 def client(settings):

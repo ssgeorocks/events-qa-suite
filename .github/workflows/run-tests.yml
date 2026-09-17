@@ -53,9 +53,9 @@ jobs:
                   DB_NAME=jwt_test
                   COOKIE=cookietoken
                   SECRET=ci-not-a-real-secret
-                  CLIENT_ID=ci-dummy-client-id
-                  CLIENT_SECRET=ci-dummy-client-secret
-                  CALLBACK_URL=http://localhost:8080/api/sessions/githubcallback
+                  CLIENTID=ci-dummy-client-id
+                  CLIENTSECRET=ci-dummy-client-secret
+                  CALLBACKURL=http://localhost:8080/api/sessions/githubcallback
                   EOF
 
             - name: Start events application
